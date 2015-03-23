@@ -86,13 +86,11 @@ func (h *HUB) Start(num int) {
 
 func (h *HUB) runPub() {
 	for {
-		select {
-		case c := <-h.pub:
-			for _, v := range h.listeners {
-				if v.event == c.Name {
-					for _, f := range v.funcs {
-						f(&c)
-					}
+		c := <-h.pub
+		for _, v := range h.listeners {
+			if v.event == c.Name {
+				for _, f := range v.funcs {
+					f(&c)
 				}
 			}
 		}
@@ -101,9 +99,6 @@ func (h *HUB) runPub() {
 
 func (h *HUB) runSub() {
 	for {
-		select {
-		case s := <-h.sub:
-			h.listeners = append(h.listeners, s)
-		}
+		h.listeners = append(h.listeners, <-h.sub)
 	}
 }
